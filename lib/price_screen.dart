@@ -10,7 +10,8 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
-  double lastPrice;
+  int displayIndex = 19;
+  double lastPrice = 0.0;
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -28,6 +29,7 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value) {
         setState(() {
           selectedCurrency = value;
+          getPriceData();
         });
       },
     );
@@ -40,10 +42,16 @@ class _PriceScreenState extends State<PriceScreen> {
     }
 
     return CupertinoPicker(
+      scrollController: FixedExtentScrollController(initialItem: displayIndex),
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) {
-        print(selectedIndex);
+        setState(() {
+          print(selectedIndex);
+          displayIndex = selectedIndex;
+          selectedCurrency = currenciesList[selectedIndex];
+          getPriceData();
+        });
       },
       children: pickerItems,
     );
@@ -52,7 +60,7 @@ class _PriceScreenState extends State<PriceScreen> {
   //TODO: Create a method here called getData() to get the coin data from coin_data.dart
   void getPriceData() async {
     CoinData coinData = CoinData();
-    var coinPrice = await coinData.getCoinData();
+    var coinPrice = await coinData.getCoinData(selectedCurrency);
 
     setState(() {
       if (coinPrice == null) {
@@ -92,7 +100,7 @@ class _PriceScreenState extends State<PriceScreen> {
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
                   //TODO: Update the Text Widget with the live bitcoin data here.
-                  '1 BTC = ${lastPrice.toString()} USD',
+                  '1 BTC = ${lastPrice.toString()} $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,

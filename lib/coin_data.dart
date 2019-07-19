@@ -36,8 +36,8 @@ const bitcoinAverageURL =
 
 class CoinData {
 
-  Future<dynamic> getCoinData() async {
-    var url = '$bitcoinAverageURL/BTCUSD';
+  Future<dynamic> getCoinData(String currency) async {
+    var url = '$bitcoinAverageURL/BTC$currency';
     print(url);
     NetworkHelper networkHelper = NetworkHelper(url);
 
