@@ -11,7 +11,10 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
   int displayIndex = 19;
-  double lastPrice = 0.0;
+  List<double> cryptoPrice = [];
+  double lastBTCPrice = 0.0;
+  double lastETHPrice = 0.0;
+  double lastLTCPrice = 0.0;
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -57,24 +60,37 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-  //TODO: Create a method here called getData() to get the coin data from coin_data.dart
   void getPriceData() async {
+    cryptoPrice.clear();
     CoinData coinData = CoinData();
-    var coinPrice = await coinData.getCoinData(selectedCurrency);
+
+    for (String crypto in cryptoList) {
+      var coinPrice = await coinData.getCoinData(crypto, selectedCurrency);
+      if (coinPrice == null) {
+        cryptoPrice.add(0.00);
+      } else {
+        cryptoPrice.add(coinPrice['last']);
+      }
+    }
+    print(cryptoPrice);
 
     setState(() {
-      if (coinPrice == null) {
-        lastPrice = 0.00;
-      }
-      lastPrice = coinPrice['last'];
-      print(lastPrice);
+      lastBTCPrice = cryptoPrice[0];
+      lastETHPrice = cryptoPrice[1];
+      lastLTCPrice = cryptoPrice[2];
     });
+
+    // setState(() {
+    //   if (coinPrice == null) {
+    //     lastBTCPrice = 0.00;
+    //   }
+    //   lastBTCPrice = coinPrice['last'];
+    // });
   }
 
   @override
   void initState() {
     super.initState();
-    //TODO: Call getData() when the screen loads up.
     getPriceData();
   }
 
@@ -99,8 +115,49 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  //TODO: Update the Text Widget with the live bitcoin data here.
-                  '1 BTC = ${lastPrice.toString()} $selectedCurrency',
+                  '1 BTC = ${lastBTCPrice.toString()} $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            child: Card(
+              color: Colors.lightBlueAccent,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  '1 ETH = ${lastETHPrice.toString()} $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            child: Card(
+              color: Colors.lightBlueAccent,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  '1 LTC = ${lastLTCPrice.toString()} $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
